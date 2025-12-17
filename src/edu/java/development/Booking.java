@@ -46,7 +46,7 @@ public class Booking {
     }
 
     public void displayInfo(){
-        System.out.println("Booking ID: " + bookkingld);
+        System.out.println("Booking ID:" + bookkingld);
         System.out.println("Passanger: " + passanger.getName());
         System.out.println("Flight: " + flight.getFlightNo());
         System.out.println("Seat No: " + seatNo);
