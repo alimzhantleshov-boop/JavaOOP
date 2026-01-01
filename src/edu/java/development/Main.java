@@ -1,41 +1,84 @@
 package edu.java.development;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
 public class Main {
+
+    // КАРТА РАССТОЯНИЙ
+    static Map<String, Integer> distanceMap = new HashMap<>();
+
     public static void main(String[] args) {
 
-        FlightTicket airAstana =
-                new FlightTicket("Air Astana", 55000, 1.5, 23);
+        // Заполняем карту (как база данных)
+        initDistances();
 
-        FlightTicket scAt =
-                new FlightTicket("SCAT", 42000, 2.0, 20);
+        Scanner scanner = new Scanner(System.in);
 
-        // 1) какой дешевле
-        FlightTicket cheaper =
-                (airAstana.getPrice() < scAt.getPrice()) ? airAstana : scAt;
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
 
-        // 2) какой выгоднее по времени
-        FlightTicket betterByTime =
-                (airAstana.costPerHour() < scAt.costPerHour()) ? airAstana : scAt;
+        System.out.print("Enter passport number: ");
+        String passport = scanner.nextLine();
 
-        System.out.println("Cheaper ticket: " + cheaper.getAirline());
-        System.out.println("Better by time: " + betterByTime.getAirline());
+        System.out.print("From city: ");
+        String from = scanner.nextLine();
 
-        System.out.println("Air Astana cost/hour = " + airAstana.costPerHour());
-        System.out.println("SCAT cost/hour = " + scAt.costPerHour());
+        System.out.print("To city: ");
+        String to = scanner.nextLine();
 
+        System.out.print("Enter flight date (YYYY-MM-DD): ");
+        LocalDate flightDate = LocalDate.parse(scanner.nextLine());
 
-        Flight flight1 = new Flight("KC123", "Astana", "Almaty", 25000);
+        int distance = getDistance(from, to);
 
-        Passanger passenger1 = new Passanger("Alimzhan", "KZ123456", 19);
+        int basePrice = distance * 15;
 
+        long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), flightDate);
+        double multiplier = getDateMultiplier(daysBefore);
 
-        Booking booking1 = new Booking("B001", passenger1, flight1, "12A", "CONFIRMED");
+        int finalPrice = (int) (basePrice * multiplier);
 
-        // Вывод информации
-        flight1.displayInfo();
-        System.out.println("----------------------");
-        passenger1.displayInfo();
-        System.out.println("----------------------");
-        booking1.displayInfo();
+        System.out.println("\n=== TICKET INFO ===");
+        System.out.println("Passenger: " + name);
+        System.out.println("Passport: " + passport);
+        System.out.println("Route: " + from + " -> " + to);
+        System.out.println("Distance: " + distance + " km");
+        System.out.println("Days before flight: " + daysBefore);
+        System.out.println("Final price: " + finalPrice + " KZT");
+        System.out.println("Status: CONFIRMED");
+    }
+
+    // Заполняем карту расстояний
+    static void initDistances() {
+        distanceMap.put("Astana-Almaty", 1200);
+        distanceMap.put("Almaty-Astana", 1200);
+
+        distanceMap.put("Astana-Shymkent", 1400);
+        distanceMap.put("Shymkent-Astana", 1400);
+
+        distanceMap.put("Almaty-Shymkent", 700);
+        distanceMap.put("Shymkent-Almaty", 700);
+    }
+
+    // Получаем расстояние из карты
+    static int getDistance(String from, String to) {
+        String key = from + "-" + to;
+
+        if (distanceMap.containsKey(key)) {
+            return distanceMap.get(key);
+        }
+
+        return 1000; // если маршрут неизвестен
+    }
+
+    // Надбавка по дате
+    static double getDateMultiplier(long days) {
+        if (days < 7) return 1.5;
+        if (days <= 30) return 1.2;
+        return 1.0;
     }
 }
