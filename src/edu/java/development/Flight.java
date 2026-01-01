@@ -3,23 +3,19 @@ package edu.java.development;
 public class Flight {
     private String from;
     private String to;
-    private int price;
+    private int distance;
 
-    public Flight(String from, String to, int price) {
+    public Flight(String from, String to, int distance) {
         this.from = from;
         this.to = to;
-        this.price = price;
+        this.distance = distance;
     }
 
-    public String getFrom() {
-        return from;
+    public int getDistance() {
+        return distance;
     }
 
-    public String getTo() {
-        return to;
-    }
-
-    public int getPrice() {
-        return price;
+    public String getRoute() {
+        return from + " → " + to;
     }
 }

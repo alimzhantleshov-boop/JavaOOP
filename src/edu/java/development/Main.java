@@ -1,28 +1,56 @@
 package edu.java.development;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 
-    // КАРТА РАССТОЯНИЙ
-    static Map<String, Integer> distanceMap = new HashMap<>();
+    static Scanner scanner = new Scanner(System.in);
+    static UserService userService = new UserService();
 
     public static void main(String[] args) {
 
-        // Заполняем карту (как база данных)
-        initDistances();
+        User currentUser = null;
 
-        Scanner scanner = new Scanner(System.in);
+        while (currentUser == null) {
+            System.out.println("\n1. Register");
+            System.out.println("2. Login");
+            System.out.print("Choose: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine();
+            if (choice == 1) {
+                System.out.print("Username: ");
+                String u = scanner.nextLine();
+                System.out.print("Password: ");
+                String p = scanner.nextLine();
 
-        System.out.print("Enter passport number: ");
-        String passport = scanner.nextLine();
+                if (userService.register(u, p)) {
+                    System.out.println("✅ Registered");
+                } else {
+                    System.out.println("❌ Username exists");
+                }
+            }
+
+            if (choice == 2) {
+                System.out.print("Username: ");
+                String u = scanner.nextLine();
+                System.out.print("Password: ");
+                String p = scanner.nextLine();
+
+                currentUser = userService.login(u, p);
+
+                if (currentUser == null) {
+                    System.out.println("❌ Wrong login");
+                }
+            }
+        }
+
+        System.out.println("\nWelcome, " + currentUser.getUsername());
+        buyTicket();
+    }
+
+    static void buyTicket() {
 
         System.out.print("From city: ");
         String from = scanner.nextLine();
@@ -30,55 +58,20 @@ public class Main {
         System.out.print("To city: ");
         String to = scanner.nextLine();
 
-        System.out.print("Enter flight date (YYYY-MM-DD): ");
-        LocalDate flightDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Flight date (YYYY-MM-DD): ");
+        LocalDate date = LocalDate.parse(scanner.nextLine());
 
-        int distance = getDistance(from, to);
+        // простая "карта"
+        int distance = from.equalsIgnoreCase("Astana")
+                && to.equalsIgnoreCase("Almaty") ? 1200 : 800;
 
-        int basePrice = distance * 15;
+        Flight flight = new Flight(from, to, distance);
 
-        long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), flightDate);
-        double multiplier = getDateMultiplier(daysBefore);
+        int price = TicketService.calculatePrice(flight, date);
 
-        int finalPrice = (int) (basePrice * multiplier);
-
-        System.out.println("\n=== TICKET INFO ===");
-        System.out.println("Passenger: " + name);
-        System.out.println("Passport: " + passport);
-        System.out.println("Route: " + from + " -> " + to);
-        System.out.println("Distance: " + distance + " km");
-        System.out.println("Days before flight: " + daysBefore);
-        System.out.println("Final price: " + finalPrice + " KZT");
-        System.out.println("Status: CONFIRMED");
-    }
-
-    // Заполняем карту расстояний
-    static void initDistances() {
-        distanceMap.put("Astana-Almaty", 1200);
-        distanceMap.put("Almaty-Astana", 1200);
-
-        distanceMap.put("Astana-Shymkent", 1400);
-        distanceMap.put("Shymkent-Astana", 1400);
-
-        distanceMap.put("Almaty-Shymkent", 700);
-        distanceMap.put("Shymkent-Almaty", 700);
-    }
-
-    // Получаем расстояние из карты
-    static int getDistance(String from, String to) {
-        String key = from + "-" + to;
-
-        if (distanceMap.containsKey(key)) {
-            return distanceMap.get(key);
-        }
-
-        return 1000; // если маршрут неизвестен
-    }
-
-    // Надбавка по дате
-    static double getDateMultiplier(long days) {
-        if (days < 7) return 1.5;
-        if (days <= 30) return 1.2;
-        return 1.0;
+        System.out.println("\n🎫 TICKET CONFIRMED");
+        System.out.println("Route: " + flight.getRoute());
+        System.out.println("Date: " + date);
+        System.out.println("Price: " + price + " KZT");
     }
 }
