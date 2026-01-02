@@ -1,41 +1,77 @@
 package edu.java.development;
 
+import java.time.LocalDate;
+import java.util.Scanner;
+
 public class Main {
+
+    static Scanner scanner = new Scanner(System.in);
+    static UserService userService = new UserService();
+
     public static void main(String[] args) {
 
-        FlightTicket airAstana =
-                new FlightTicket("Air Astana", 55000, 1.5, 23);
+        User currentUser = null;
 
-        FlightTicket scAt =
-                new FlightTicket("SCAT", 42000, 2.0, 20);
+        while (currentUser == null) {
+            System.out.println("\n1. Register");
+            System.out.println("2. Login");
+            System.out.print("Choose: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-        // 1) какой дешевле
-        FlightTicket cheaper =
-                (airAstana.getPrice() < scAt.getPrice()) ? airAstana : scAt;
+            if (choice == 1) {
+                System.out.print("Username: ");
+                String u = scanner.nextLine();
+                System.out.print("Password: ");
+                String p = scanner.nextLine();
 
-        // 2) какой выгоднее по времени
-        FlightTicket betterByTime =
-                (airAstana.costPerHour() < scAt.costPerHour()) ? airAstana : scAt;
+                if (userService.register(u, p)) {
+                    System.out.println("✅ Registered");
+                } else {
+                    System.out.println("❌ Username exists");
+                }
+            }
 
-        System.out.println("Cheaper ticket: " + cheaper.getAirline());
-        System.out.println("Better by time: " + betterByTime.getAirline());
+            if (choice == 2) {
+                System.out.print("Username: ");
+                String u = scanner.nextLine();
+                System.out.print("Password: ");
+                String p = scanner.nextLine();
 
-        System.out.println("Air Astana cost/hour = " + airAstana.costPerHour());
-        System.out.println("SCAT cost/hour = " + scAt.costPerHour());
+                currentUser = userService.login(u, p);
 
+                if (currentUser == null) {
+                    System.out.println("❌ Wrong login");
+                }
+            }
+        }
 
-        Flight flight1 = new Flight("KC123", "Astana", "Almaty", 25000);
+        System.out.println("\nWelcome, " + currentUser.getUsername());
+        buyTicket();
+    }
 
-        Passanger passenger1 = new Passanger("Alimzhan", "KZ123456", 19);
+    static void buyTicket() {
 
+        System.out.print("From city: ");
+        String from = scanner.nextLine();
 
-        Booking booking1 = new Booking("B001", passenger1, flight1, "12A", "CONFIRMED");
+        System.out.print("To city: ");
+        String to = scanner.nextLine();
 
-        // Вывод информации
-        flight1.displayInfo();
-        System.out.println("----------------------");
-        passenger1.displayInfo();
-        System.out.println("----------------------");
-        booking1.displayInfo();
+        System.out.print("Flight date (YYYY-MM-DD): ");
+        LocalDate date = LocalDate.parse(scanner.nextLine());
+
+        // простая "карта"
+        int distance = from.equalsIgnoreCase("Astana")
+                && to.equalsIgnoreCase("Almaty") ? 1200 : 800;
+
+        Flight flight = new Flight(from, to, distance);
+
+        int price = TicketService.calculatePrice(flight, date);
+
+        System.out.println("\n🎫 TICKET CONFIRMED");
+        System.out.println("Route: " + flight.getRoute());
+        System.out.println("Date: " + date);
+        System.out.println("Price: " + price + " KZT");
     }
 }
