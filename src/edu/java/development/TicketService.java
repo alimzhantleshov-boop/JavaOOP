@@ -1,21 +1,14 @@
 package edu.java.development;
 
-import java.time.LocalDate;
-
 public class TicketService {
 
-    public static int calculatePrice(Flight flight, LocalDate date) {
+    public Ticket calculatePrice(Flight flight, String seatClass) {
+        int basePrice = flight.getDistanceKm() * 10;
 
-        int basePrice = flight.getDistance() * 50;
-
-        long daysLeft = LocalDate.now().until(date).getDays();
-
-        if (daysLeft <= 3) {
-            basePrice *= 1.5;
-        } else if (daysLeft <= 7) {
-            basePrice *= 1.2;
+        if (seatClass.equalsIgnoreCase("BUSINESS")) {
+            basePrice *= 2;
         }
 
-        return basePrice;
+        return new Ticket(basePrice);
     }
 }

@@ -1,21 +1,23 @@
 package edu.java.development;
 
 public class Flight {
+    private String flightNumber;
     private String from;
     private String to;
-    private int distance;
+    private int distanceKm;
 
-    public Flight(String from, String to, int distance) {
+    public Flight(String flightNumber, String from, String to, int distanceKm) {
+        this.flightNumber = flightNumber;
         this.from = from;
         this.to = to;
-        this.distance = distance;
+        this.distanceKm = distanceKm;
     }
 
-    public int getDistance() {
-        return distance;
+    public int getDistanceKm() {
+        return distanceKm;
     }
 
-    public String getRoute() {
-        return from + " → " + to;
+    public String getFlightNumber() {
+        return flightNumber;
     }
 }

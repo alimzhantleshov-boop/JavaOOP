@@ -1,77 +1,40 @@
 package edu.java.development;
 
-import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
-
-    static Scanner scanner = new Scanner(System.in);
-    static UserService userService = new UserService();
-
     public static void main(String[] args) {
 
-        User currentUser = null;
+        Scanner scanner = new Scanner(System.in);
 
-        while (currentUser == null) {
-            System.out.println("\n1. Register");
-            System.out.println("2. Login");
-            System.out.print("Choose: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            UserService userService = new UserService();
+             System.out.print("Create username: ");
+              String username = scanner.nextLine();
+            System.out.print("Create password: ");
+        String password = scanner.nextLine();
 
-            if (choice == 1) {
-                System.out.print("Username: ");
-                String u = scanner.nextLine();
-                System.out.print("Password: ");
-                String p = scanner.nextLine();
+        User user = userService.register(username, password);
+            System.out.println("User created: " + user.getUsername());
 
-                if (userService.register(u, p)) {
-                    System.out.println("✅ Registered");
-                } else {
-                    System.out.println("❌ Username exists");
-                }
-            }
+        System.out.print("Enter passenger name: ");
+            String name = scanner.nextLine();
+        System.out.print("Enter passport number: ");
+            String passport = scanner.nextLine();
 
-            if (choice == 2) {
-                System.out.print("Username: ");
-                String u = scanner.nextLine();
-                System.out.print("Password: ");
-                String p = scanner.nextLine();
+        Passenger passenger = new Passenger(name, passport);
 
-                currentUser = userService.login(u, p);
+        Flight flight = new Flight("KC123", "Astana", "Almaty", 1200);
 
-                if (currentUser == null) {
-                    System.out.println("❌ Wrong login");
-                }
-            }
-        }
+        System.out.print("Choose class (ECONOMY/BUSINESS): ");
+        String seatClass = scanner.nextLine();
 
-        System.out.println("\nWelcome, " + currentUser.getUsername());
-        buyTicket();
-    }
+        TicketService ticketService = new TicketService();
+        Ticket ticket = ticketService.calculatePrice(flight, seatClass);
 
-    static void buyTicket() {
+        Booking booking = new Booking(passenger, flight);
 
-        System.out.print("From city: ");
-        String from = scanner.nextLine();
-
-        System.out.print("To city: ");
-        String to = scanner.nextLine();
-
-        System.out.print("Flight date (YYYY-MM-DD): ");
-        LocalDate date = LocalDate.parse(scanner.nextLine());
-
-        // простая "карта"
-        int distance = from.equalsIgnoreCase("Astana")
-                && to.equalsIgnoreCase("Almaty") ? 1200 : 800;
-
-        Flight flight = new Flight(from, to, distance);
-
-        int price = TicketService.calculatePrice(flight, date);
-
-        System.out.println("\n🎫 TICKET CONFIRMED");
-        System.out.println("Route: " + flight.getRoute());
-        System.out.println("Date: " + date);
-        System.out.println("Price: " + price + " KZT");
+        System.out.println("\n--- BOOKING INFO ---");
+        booking.displayInfo();
+        System.out.println("Ticket price: " + ticket.getPrice() + " KZT");
     }
 }

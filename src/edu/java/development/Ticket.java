@@ -1,24 +1,17 @@
 package edu.java.development;
 
 public class Ticket {
+    private int price;
 
-    private String ticketId;
-    private double price;
-
-    public Ticket(String ticketId, double price) {
-        this.ticketId = ticketId;
+    public Ticket(int price) {
         this.price = price;
     }
 
-    public String getTicketId() {
-        return ticketId;
-    }
-
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public boolean isCheaperThan(Ticket otherTicket) {
-        return this.price < otherTicket.price;
+    public boolean isMoreExpensiveThan(Ticket other) {
+        return this.price > other.price;
     }
 }
