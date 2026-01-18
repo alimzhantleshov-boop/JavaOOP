@@ -1,40 +1,53 @@
 package edu.java.development;
 
-import java.util.Scanner;
+import java.sql.*;
 
 public class Main {
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Connection conn = DBConnection.getConnection();
+        if (conn == null) return;
 
-            UserService userService = new UserService();
-             System.out.print("Create username: ");
-              String username = scanner.nextLine();
-            System.out.print("Create password: ");
-        String password = scanner.nextLine();
+        try {
+            Statement stmt = conn.createStatement();
 
-        User user = userService.register(username, password);
-            System.out.println("User created: " + user.getUsername());
+            // CREATE
+            stmt.executeUpdate("""
+                INSERT INTO flight (flight_number, origin, destination)
+                VALUES ('KZ101', 'Almaty', 'Astana')
+            """);
 
-        System.out.print("Enter passenger name: ");
-            String name = scanner.nextLine();
-        System.out.print("Enter passport number: ");
-            String passport = scanner.nextLine();
+            // READ
+            ResultSet rs = stmt.executeQuery("SELECT * FROM flight");
+            while (rs.next()) {
+                System.out.println(
+                        rs.getInt("id") + " " +
+                                rs.getString("flight_number") + " " +
+                                rs.getString("origin") + " " +
+                                rs.getString("destination")
+                );
+            }
 
-        Passenger passenger = new Passenger(name, passport);
+            // UPDATE
+            stmt.executeUpdate("""
+                UPDATE flight
+                SET destination = 'Shymkent'
+                WHERE flight_number = 'KZ101'
+            """);
 
-        Flight flight = new Flight("KC123", "Astana", "Almaty", 1200);
+            // DELETE
+            stmt.executeUpdate("""
+                DELETE FROM flight
+                WHERE flight_number = 'KZ101'
+            """);
 
-        System.out.print("Choose class (ECONOMY/BUSINESS): ");
-        String seatClass = scanner.nextLine();
+            stmt.close();
+            conn.close();
 
-        TicketService ticketService = new TicketService();
-        Ticket ticket = ticketService.calculatePrice(flight, seatClass);
+            System.out.println("CRUD done");
 
-        Booking booking = new Booking(passenger, flight);
-
-        System.out.println("\n--- BOOKING INFO ---");
-        booking.displayInfo();
-        System.out.println("Ticket price: " + ticket.getPrice() + " KZT");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
